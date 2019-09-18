@@ -45,3 +45,24 @@ private:
 	bool		is_page_executable;
 	bool		injected;
 };
+
+class function_crypt
+{
+public:
+	function_crypt(void* fn, void* stub);
+
+	void encrypt(DWORD key);
+	void decrypt(DWORD key);
+
+	const uint32_t	get_function_size()		const { return fn_size; }
+
+	template<typename... Args>
+	std::int32_t call(Args... args)
+	{
+		return reinterpret_cast<std::int32_t(*)(Args...)>(fn_handle)(args...);
+	}
+
+private:
+	void* fn_handle;
+	uint32_t	fn_size;
+};

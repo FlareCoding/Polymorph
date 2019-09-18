@@ -4,6 +4,8 @@ using std::cin;
 
 #include "Memory.h"
 
+constexpr DWORD ENCRYPTION_KEY = 0x5B;
+
 int addition_func_to_override(int x, int y)
 {
 	return x + y;
@@ -52,6 +54,24 @@ int main()
 	// Calling the restored function code
 	result = hook.call<int, int>(12, 5);
 	cout << "Arguments: 12, 5 \nResult: " << result << "\n\n";
+
+	//===================================================================================//
+	//===================================================================================//
+
+	function_crypt crypt(addition_func_to_override, stub_fn);
+	cout << "\n======= Demonstrating Function Encryption =======\n\n";
+	cout << "Calling Original Unencrypted Function\n12 + 5 = " << crypt.call<int, int>(12, 5) << "\n";
+	cout << "Original Unencrypted Function Content:\n" << memory_utils::bytes_to_string((bytearray_t)addition_func_to_override, crypt.get_function_size()) << "\n\n";
+
+	crypt.encrypt(ENCRYPTION_KEY);
+	cout << "Calling Function After Encryption . . .\n12 + 5 = [spoiler alert... function won't work and program will crash]\n";
+	cout << "Encrypted Function Content:\n" << memory_utils::bytes_to_string((bytearray_t)addition_func_to_override, crypt.get_function_size()) << "\n\n";
+
+	cout << "Decrypting the function back...\n\n";
+
+	crypt.decrypt(ENCRYPTION_KEY);
+	cout << "Calling Function After Decrypting\n12 + 5 = " << crypt.call<int, int>(12, 5) << "\n";
+	cout << "Decrypted Function Content:\n" << memory_utils::bytes_to_string((bytearray_t)addition_func_to_override, crypt.get_function_size()) << "\n\n";
 
 	cout << "\n";
 	return 0;

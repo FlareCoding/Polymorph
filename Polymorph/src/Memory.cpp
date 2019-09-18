@@ -63,3 +63,20 @@ const std::string function_hook::dump_content() const
 {
 	return memory_utils::bytes_to_string((bytearray_t)fn_handle, fn_size);
 }
+
+function_crypt::function_crypt(void* fn, void* stub)
+	: fn_handle(fn), fn_size(memory_utils::get_function_size(fn, stub))
+{
+}
+
+void function_crypt::encrypt(DWORD key)
+{
+	for (uint32_t i = 0; i < fn_size; i++)
+		((bytearray_t)fn_handle)[i] ^= key;
+}
+
+void function_crypt::decrypt(DWORD key)
+{
+	for (uint32_t i = 0; i < fn_size; i++)
+		((bytearray_t)fn_handle)[i] ^= key;
+}
